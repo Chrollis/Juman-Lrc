@@ -17,6 +17,18 @@ Output: `build/Release/jumanlrc_lib.lib`
 
 Requires: CMake ≥ 3.10, C++14, model file `jumandic.jppmdl` (from the [official release](https://github.com/ku-nlp/jumanpp/releases)).
 
+### Example program
+
+An example program `json_example` is available under `examples/`, using [nlohmann/json](https://github.com/nlohmann/json) (header-only, bundled in `examples/json/`) to format analysis results as JSON.
+
+```bash
+mkdir build && cd build
+cmake .. -DJUMANLRC_BUILD_EXAMPLES=ON
+cmake --build . --config Release
+
+./Release/json_example --model jumandic.jppmdl --text "私は学生です"
+```
+
 ---
 
 ## C API

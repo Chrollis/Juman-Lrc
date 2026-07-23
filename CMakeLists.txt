@@ -144,3 +144,20 @@ endif()
 install(TARGETS jumanlrc_lib DESTINATION lib)
 install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/jumanlrc_capi.h"
   DESTINATION include)
+
+# ─── Example programs ───────────────────────────────────────────
+option(JUMANLRC_BUILD_EXAMPLES "Build example programs" OFF)
+
+if(JUMANLRC_BUILD_EXAMPLES)
+  add_executable(json_example
+    "${CMAKE_CURRENT_SOURCE_DIR}/examples/json_example.cpp")
+  target_include_directories(json_example PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"
+    "${CMAKE_CURRENT_SOURCE_DIR}/examples/json")
+  target_link_libraries(json_example PRIVATE
+    jumanlrc_lib
+    ${CMAKE_THREAD_LIBS_INIT})
+  if(WIN32)
+    target_link_libraries(json_example PRIVATE shlwapi)
+  endif()
+endif()
