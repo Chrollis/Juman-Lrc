@@ -50,14 +50,14 @@ jumanpp_free_result(surfaces, readings, count);
 jumanpp_destroy(h);
 ```
 
-| Function | Description |
-|---|---|
-| `jumanpp_init(path)` | Load model |
+| Function                                        | Description           |
+| ----------------------------------------------- | --------------------- |
+| `jumanpp_init(path)`                            | Load model            |
 | `jumanpp_init_ex(path,beam,global,right,check)` | Load with custom beam |
-| `jumanpp_analyze(h,text,&surf,&read)` | Analyze → word count |
-| `jumanpp_free_result(surf,read,count)` | Free results |
-| `jumanpp_error(h)` | Last error |
-| `jumanpp_destroy(h)` | Cleanup |
+| `jumanpp_analyze(h,text,&surf,&read)`           | Analyze → word count  |
+| `jumanpp_free_result(surf,read,count)`          | Free results          |
+| `jumanpp_error(h)`                              | Last error            |
+| `jumanpp_destroy(h)`                            | Cleanup               |
 
 ---
 
@@ -94,37 +94,76 @@ for (auto& u : jpp.lastRubyResult()) {
 // → 明日(あ,す) 学校(が,っ,こ,う) へ 行(い) く
 ```
 
-| Method | Description |
-|---|---|
-| `loadModel(path, ...)` | Load model with optional beam params |
-| `analyze(text)` | Word-level analysis |
-| `analyzeRuby(text)` | Mora-level ruby analysis |
+| Method                        | Description                           |
+| ----------------------------- | ------------------------------------- |
+| `loadModel(path, ...)`        | Load model with optional beam params  |
+| `analyze(text)`               | Word-level analysis                   |
+| `analyzeRuby(text)`           | Mora-level ruby analysis              |
 | `setKatakanaAnnotation(bool)` | Toggle katakana → hiragana annotation |
-| `lastResult()` | `vector<WordResult>` |
-| `lastRubyResult()` | `vector<RubyUnit>` |
+| `lastResult()`                | `vector<WordResult>`                  |
+| `lastRubyResult()`            | `vector<RubyUnit>`                    |
+
+---
+
+## Node.js API
+
+Native Node.js addon (N-API) is available under [`node/`](node/).
+
+```bash
+cd node
+npm install
+```
+
+```js
+const { JumanLRC } = require('./node');
+
+const jpp = new JumanLRC();
+jpp.loadModel('jumandic.jppmdl');
+
+// Word-level
+const words = jpp.analyze('私は学生です');
+// → [{surface:'私', reading:'わたし'}, ...]
+
+// Ruby-ready
+const ruby = jpp.analyzeRuby('明日学校へ行く');
+// → [{surface:'明日', readings:['あ','す']}, ...]
+
+jpp.destroy();
+```
+
+| Method                        | Returns        | Description                       |
+| ----------------------------- | -------------- | --------------------------------- |
+| `loadModel(path, opts?)`      | `boolean`      | Load model (beam params optional) |
+| `analyze(text)`               | `WordResult[]` | Word-level analysis               |
+| `analyzeRuby(text)`           | `RubyUnit[]`   | Mora-level ruby analysis          |
+| `setKatakanaAnnotation(bool)` | `void`         | Toggle katakana → hiragana        |
+| `getError()`                  | `string`       | Last error message                |
+| `destroy()`                   | `void`         | Release resources                 |
+
+TypeScript declarations included (`index.d.ts`).
 
 ---
 
 ## Output examples
 
-| Text | `analyzeRuby` output |
-|---|---|
-| 私は学生です | `私(わ,た,し) は 学生(が,く,せ,い) で す` |
-| 東京大学教授 | `東京(と,う,きょ,う) 大学(だ,い,が,く) 教授(きょ,う,じゅ)` |
-| ちょっと待って | `ちょ っ と 待(ま) っ て` |
-| アーケードで遊ぶ | `ア ー ケ ー ド で 遊(あ,そ) ぶ` |
-| 明日学校へ行く | `明日(あ,す) 学校(が,っ,こ,う) へ 行(い) く` |
-| ラーメンを食べる (kata-on) | `ラ(ら) ー メ(め) ン(ん) を 食(た) べ る` |
+| Text                       | `analyzeRuby` output                                       |
+| -------------------------- | ---------------------------------------------------------- |
+| 私は学生です               | `私(わ,た,し) は 学生(が,く,せ,い) で す`                  |
+| 東京大学教授               | `東京(と,う,きょ,う) 大学(だ,い,が,く) 教授(きょ,う,じゅ)` |
+| ちょっと待って             | `ちょ っ と 待(ま) っ て`                                  |
+| アーケードで遊ぶ           | `ア ー ケ ー ド で 遊(あ,そ) ぶ`                           |
+| 明日学校へ行く             | `明日(あ,す) 学校(が,っ,こ,う) へ 行(い) く`               |
+| ラーメンを食べる (kata-on) | `ラ(ら) ー メ(め) ン(ん) を 食(た) べ る`                  |
 
 ### Mora splitting rules
 
-| Pattern | Rule | Example |
-|---|---|---|
-| 拗音 (yōon) | 1 mora | `きょ`, `しゅ`, `ちょ` |
-| 促音 (sokuon) | independent | `っ`, `ッ` |
-| 長音 (chōon) | independent | `ー` |
-| 送り仮名 (okurigana) | separated | `行(い) く` |
-| 漢字語 (kanji compound) | whole word, mora reading | `学校(が,っ,こ,う)` |
+| Pattern                 | Rule                     | Example                |
+| ----------------------- | ------------------------ | ---------------------- |
+| 拗音 (yōon)             | 1 mora                   | `きょ`, `しゅ`, `ちょ` |
+| 促音 (sokuon)           | independent              | `っ`, `ッ`             |
+| 長音 (chōon)            | independent              | `ー`                   |
+| 送り仮名 (okurigana)    | separated                | `行(い) く`            |
+| 漢字語 (kanji compound) | whole word, mora reading | `学校(が,っ,こ,う)`    |
 
 ### Data structures
 
